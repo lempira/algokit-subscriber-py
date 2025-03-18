@@ -68,7 +68,8 @@ jobs:
           # Build the package
           poetry build
           # Create GitHub release
-          echo $NEW_ENTRY | gh release create "v$VERSION" --title "v$VERSION" ./dist/* --notes-file -
+          echo $NEW_ENTRY > release.md
+          gh release create "v$VERSION" --title "v$VERSION" ./dist/* --notes-file release.md
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 

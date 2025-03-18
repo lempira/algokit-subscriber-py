@@ -57,7 +57,7 @@ jobs:
           # Update CHANGELOG.md
           TODAY=$(date +%Y-%m-%d)
           NEW_ENTRY="## v$VERSION ($TODAY)\n\n### Chore\n\n* Bumped major version"
-          sed -i 's/<!--next-version-placeholder-->/<!--next-version-placeholder-->\n\n'"$NEW_ENTRY"'/' CHANGELOG.md
+          sed -i 's/# Changelog/# Changelog\n\n'"$NEW_ENTRY"'/' CHANGELOG.md
           # Commit both changes together
           git add pyproject.toml CHANGELOG.md
           git commit -t "$VERSION" -m "$VERSION"
@@ -69,18 +69,6 @@ jobs:
           poetry build
           # Create GitHub release
           gh release create "v$VERSION" --title "v$VERSION" ./dist/* --generate-notes
-        env:
-          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-
-      - name: Create Wheel
-        run: poetry build --format wheel
-
-      - uses: actions/upload-artifact@v4 # upload artifacts so they are retained on the job
-        with:
-          path: dist
-
-      - name: Publish to GitHub
-        run: poetry run semantic-release publish
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 

@@ -1,0 +1,89 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version number to set (e.g. 1.2.3)"
+        type: string
+        required: true
+
+concurrency: release
+
+permissions:
+  contents: write
+  packages: read
+
+jobs:
+  manual_release:
+    name: Manual Release
+    runs-on: ubuntu-latest
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+      contents: write
+      packages: read
+    steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.BOT_ID }}
+          private-key: ${{ secrets.BOT_SK }}
+
+      - uses: actions/checkout@v4
+        with:
+          # Fetch entire repository history so we can determine version number from it
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Setup Python and algokit
+        uses: ./.github/actions/setup-algokit-python
+      
+      # - name: pre-commit and pytest
+      #   run: |
+      #     set -o pipefail
+      #     poetry run pre-commit run --all-files && git diff --exit-code
+      #     poetry run pytest
+
+      - name: Set Git user as GitHub actions
+        run: git config --global user.email "actions@github.com" && git config --global user.name "github-actions"
+
+      - name: Bump Version and Changelog 
+        run: |
+          # Set the manual version from input
+          VERSION=${{ inputs.version }}
+          # Update version in pyproject.toml
+          poetry version $VERSION
+          # Update CHANGELOG.md
+          TODAY=$(date +%Y-%m-%d)
+          NEW_ENTRY="## v$VERSION ($TODAY)\n\n### Chore\n\n* Bumped major version"
+          sed -i 's/<!--next-version-placeholder-->/<!--next-version-placeholder-->\n\n'"$NEW_ENTRY"'/' CHANGELOG.md
+          # Commit both changes together
+          git add pyproject.toml CHANGELOG.md
+          git commit -t "$VERSION" -m "$VERSION"
+          # Create and push tag
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+          git push origin main
+          # Build the package
+          poetry build
+          # Create GitHub release
+          gh release create "v$VERSION" --title "v$VERSION" ./dist/* --generate-notes
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Create Wheel
+        run: poetry build --format wheel
+
+      - uses: actions/upload-artifact@v4 # upload artifacts so they are retained on the job
+        with:
+          path: dist
+
+      - name: Publish to GitHub
+        run: poetry run semantic-release publish
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      # - name: Publish to PyPI
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+

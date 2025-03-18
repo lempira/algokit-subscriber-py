@@ -3,7 +3,7 @@ name: Continuous Delivery of Python package
 on:
   push:
     branches:
-      - main
+      # - main
       - release/*
 
 concurrency: release

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v105.0.0 (2025-03-18)
+
+### Chore
+
+* Bumped major version
+
 
 ## v1.0.0-beta.5 (2025-02-15)
 

@@ -57,7 +57,7 @@ jobs:
           # Update CHANGELOG.md
           TODAY=$(date +%Y-%m-%d)
           NEW_ENTRY="## v$VERSION ($TODAY)\n\n### Chore\n\n* Bumped major version"
-          sed -i 's/# Changelog/# Changelog\n\n'"$NEW_ENTRY"'/' CHANGELOG.md
+          sed -i 's/# CHANGELOG/# CHANGELOG\n\n'"$NEW_ENTRY"'/' CHANGELOG.md
           # Commit both changes together
           git add pyproject.toml CHANGELOG.md
           git commit -t "$VERSION" -m "$VERSION"

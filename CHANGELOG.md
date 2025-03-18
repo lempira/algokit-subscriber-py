@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v200.0.0 (2025-03-18)
+
+### Chore
+
+* Bumped major version
+
 ## v108.0.0 (2025-03-18)
 
 ### Chore

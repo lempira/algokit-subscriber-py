@@ -81,7 +81,7 @@ jobs:
     name: Publish Docs
     needs: release
     # Don't publish docs for beta releases from main
-    if: github.ref != 'refs/heads/main'
+    if: inputs.production_release
     uses: ./.github/workflows/gh-pages.yaml
     permissions:
       contents: read

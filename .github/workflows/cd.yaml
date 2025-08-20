@@ -48,6 +48,12 @@ jobs:
         uses: python-semantic-release/python-semantic-release@v10.3.1
         with:
           github_token: ${{ steps.app-token.outputs.token }}
+      
+      # - name: Publish to PyPI
+      #   if: steps.release.outputs.released == 'true'
+      #   uses: pypa/gh-action-pypi-publish@release/v1
+      #   with:
+      #     verbose: true
 
 
   publish-docs:

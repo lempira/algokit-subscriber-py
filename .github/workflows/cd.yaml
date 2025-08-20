@@ -1,5 +1,7 @@
 name: Continuous Delivery of Python package
 
+run-name: ${{ inputs.production_release && 'Production Release' || 'Beta Release' }}
+
 on:
   push:
     branches:

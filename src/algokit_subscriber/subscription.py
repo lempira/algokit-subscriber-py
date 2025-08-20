@@ -87,6 +87,7 @@ def has_emitted_matching_arc28_event(  # noqa: PLR0913
     Check if a transaction has emitted a matching ARC-28 event.
 
     This is a comment to force a minor version bump.
+    This is a comment to force a minor version bump.
 
     :param logs: The transaction logs encoded as bas64 strings
     :param all_events: All ARC-28 events to process

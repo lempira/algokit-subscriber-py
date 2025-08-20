@@ -43,6 +43,9 @@ jobs:
           echo "Skipping pytest for faster CI testing"
           echo "All checks passed (dummy)"
 
+      - name: Install Poetry for semantic-release
+        run: pipx install poetry
+
       - name: Python Semantic Release
         id: release
         uses: python-semantic-release/python-semantic-release@v10.3.1

@@ -4,12 +4,20 @@ on:
   push:
     branches:
       - main
-      - release/*
+    paths-ignore:
+      - "docs/**"
+  workflow_dispatch:
+    inputs:
+      production_release:
+        description: "Production release?"
+        type: boolean
+        required: true
+        default: true
 
 concurrency: release
 
 permissions:
-  contents: read
+  contents: write
   packages: read
 
 jobs:
@@ -43,14 +51,27 @@ jobs:
           echo "Skipping pytest for faster CI testing"
           echo "All checks passed (dummy)"
 
-      - name: Python Semantic Release
-        id: release
+      - name: Get branch name
+        shell: bash
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        id: get_branch
+
+      - name: Python Semantic Release - Beta (non-prod)
+        id: release-beta
+        if: steps.get_branch.outputs.branch == 'main' && !inputs.production_release
         uses: python-semantic-release/python-semantic-release@v10.3.1
         with:
           github_token: ${{ steps.app-token.outputs.token }}
-      
+          prerelease: true
+
+      - name: Python Semantic Release - Production
+        id: release-prod
+        if: steps.get_branch.outputs.branch == 'main' && inputs.production_release
+        uses: python-semantic-release/python-semantic-release@v10.3.1
+        with:
+          github_token: ${{ steps.app-token.outputs.token }}
+
       # - name: Publish to PyPI
-      #   if: steps.release.outputs.released == 'true'
       #   uses: pypa/gh-action-pypi-publish@release/v1
       #   with:
       #     verbose: true
